@@ -1,0 +1,59 @@
+### A) Which of the paths are relative and which are the absolutes
+
+ * Name: Xuanao Zhao  
+ * Student ID: 33332835
+
+##### The following paths are absolute:
+
+ * "/home/student/Document" (or "/home/<username>/Document")  
+ * "/"  
+
+##### The following path is relative to $HOME
+
+ * "~/Documents/FIT2100"  
+
+Depending on how the interprater (the shell) works, when using "~", it could be replaced by the value of $HOME, thus forming an absolute path. For example:  
+
+ * "~/Documents/FIT2100" -> "$HOME/Documents/FIT2100" -> "/home/<username>/Docuemnts/FIT2100"  
+
+##### The folloing paths are relative to current working directory
+
+ * "." (This refers to current directory)  
+ * ".." (This refers to one level above relative to the current directory)  
+ * ".././.././home/student" (This refers to the directory "home/student" that is located 2 level above the current directory)  
+ * "FIT2100" (This refers to the directory named "FIT2100" located in the current directory)  
+
+### B) Advantages of relative path and absolute paths. Reasons of using different path
+
+##### Why do we use relative paths:
+
+The relative path is being used to refer to file objects in the current working directory the user is on, provides a stright forward user experience when navigating/refering to file using the command line interface.  
+When desigining a program, especially CLI tools that takes in file names as parameters, such as software copying file, software modifying file. It is better to design such programs to be able to work with relative paths, as the softwares can be part of batch processing script, and to be used in different context (different directory, different workspace). For example, I can have a script to cleanup workspace of a certain type of program after build, and modify files, remove unwanted files. The script can be placed in different workspace directories and if the paths are absolute, then the user will have to modify the script everytime the workspace changes location, or when using in a different workspace.  
+
+##### Why do we use absolute paths:
+
+The use of absolute path are important, as it provides a way to navigate and reference to any file and directory from anywhere in the file system. It provides user to quickly navigate to the wanted destination without going through the folder one by one.  
+When desigining a program, especially a typical linux program, it is quite useful because not all files related to the program is going to be stored in the same directory. For example, we can have configs in /etc and /usr/share, and the actual binary stored in /usr/bin, certain libraries and other related files in totally different directory. It would be nearly impossible to reference those files by relative paths if the binary is not being executed in expected location.
+
+### C) Write cd command:
+
+```bash
+# Navigate one directory above the user's directory:
+cd ~/..
+
+# Navigate to current directory:
+cd .
+```
+
+### D) The reason of ./ (in BASH Shell, the command search sequence)
+
+When executing a command in BASH, the following sequence of searching the command are being performed:
+
+ * Check for ALIASES
+ * Functions defined to bash
+ * Built-in commands (for example, cd)
+ * Executables in the $PATH directories
+ * If command is in the format of path (absolute or relative)
+
+Usually, the when executing the command that is an executable file somewhere in the system, most of the time BASH will only look at the directories defined in $PATH. However, user can execute any executable file by using any kind of path format for the command.  
+For example, there are a executale file named gcc in my current working directory, provided there are no other file named gcc in my file system, and my current directory is not in the $PATH environmental variable. Type `gcc` will make BASH search in $PATH, and display an error saying there are no such command. This is because BASH was not able to find my executable anywhere in the $PATH directories. However, when you reference the executable file using "./gcc", BASH will be able to understand where exactly this executable file is in, in this case, the current directory.

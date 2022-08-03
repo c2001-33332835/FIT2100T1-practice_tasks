@@ -1,0 +1,20 @@
+### A) file size of two compiled files
+
+when source code is being compiled using the `-g` flag, there are debug information being embeded into the executable, thus the file size are larger.  
+The original file is 20664B, and the file with `-g` flag is 21376B, different in 712B.
+
+### B) Warning message.
+
+The raw warning message outputted by gcc is:
+
+```
+Task2.c: In function ‘main’:
+Task2.c:5:23: warning: multi-character character constant [-Wmultichar]
+    5 |         char string = 'N/A'; // Initialise our string
+      |                       ^~~~~
+Task2.c:5:23: warning: overflow in conversion from ‘int’ to ‘char’ changes value from ‘5123905’ to ‘65’ [-Woverflow]
+```
+
+The code at line 5 was complained by the gcc compiler.
+
+### C)
