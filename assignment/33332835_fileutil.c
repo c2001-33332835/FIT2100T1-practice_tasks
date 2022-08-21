@@ -46,16 +46,6 @@ LinkedNode* linked_list_append(LinkedNode* source, void* data){
     return new_node;
 }
 
-LinkedNode* linked_list_pop(LinkedNode* source, void* data){
-    LinkedNode* last_node = linked_list_get_last_node(source);
-    LinkedNode* new_node;
-    new_node->data = data;
-    new_node->is_end = true;
-    last_node->next = new_node;
-    last_node->is_end = false;
-    return new_node;
-}
-
 int linked_list_length(LinkedNode* source){
     LinkedNode* node = source;
     int length = 1;
