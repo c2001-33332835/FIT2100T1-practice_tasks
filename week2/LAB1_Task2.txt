@@ -18,3 +18,9 @@ Task2.c:5:23: warning: overflow in conversion from ‘int’ to ‘char’ chang
 The code at line 5 was complained by the gcc compiler.
 
 ### C)
+
+The binary with -g flag showed more information then the binary without -g flag
+
+### D)
+
+
