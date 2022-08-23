@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #define STDIN 0
 #define STDOUT 1
@@ -13,173 +12,120 @@
 #define false 0
 
 #define PROGRAM_NAME "fileutil"
+#define FLAG_A "-a"
+#define FLAG_N "-n"
 
 // naming convensions: snake_case for globals/locals/statics and functions. CapitalizedName for struct names.
-
-// Impelementation of Linked List: LinkedNode is the nodes of the list.
-typedef struct {
-    void* data; // the actual element of the list
-    struct LinkedNode* next; // points to the next element of the list
-    int is_end; // if the node is at the end of a list
-    int is_null; // if the node is null (happens when the list is newly created and no value is provided)
-} LinkedNode;
-
-void initialize_new_node(LinkedNode* node){
-    // initialization of a new node as a new list
-    // PARAM:
-    //   - node: takes in a newly defined node, and initialize required values
-    // RETURN:
-    //   void.
-
-    node->is_end = true;
-    node->is_null = true;
-}
-
-void initialize_new_append_node(LinkedNode* node){
-    // initialization of a new node to be appended to another node
-    // PARAM:
-    //   - node: takes in a newly defined node, and initialize required values
-    // RETURN:
-    //   void.
-
-    node->is_end = true;
-    node->is_null = false;
-}
-
-LinkedNode* linked_list_get_last_node(LinkedNode* start){
-    // Gets the last node of a given starting node. 
-    // PARAM:
-    //   - start: a reference of the starting node to search
-    // RETURN:
-    //   - the reference of the last node. Returns the starting node if the list is still null, or has one element only.
-
-    if (start->is_null) {
-        return start;
-    }
-
-    LinkedNode* result = start;
-    while (!(result->is_end)){
-        result = result->next;
-    }
-    return result;
-}
-
-void linked_list_append_node(LinkedNode* start, LinkedNode* new, void* value){
-    // Append a value to the linked list to the ned of the list or updates the given node if the list is null.
-    // PARAM:
-    //   - start: takes in any node from the list
-    //   - new: the address of the new node to be appended
-    //   - value the value to be added to the new node
-    // RETURN:
-    //   - void.
-
-    LinkedNode* target;
-    if (start->is_null){
-        target = start;
-        printf("1");
-    }
-    else {
-        target = &new;
-        linked_list_get_last_node(start)->is_end = false;
-        linked_list_get_last_node(start)->next = target;
-        printf("2");
-    }
-    initialize_new_append_node(target);
-    target->data = value;
-    return target;
-}
-
-
-int linked_list_length(LinkedNode* start){
-    // Finds out the length between the starting point and the end of the list.
-    // PARAM:
-    //   - start: a reference of any node in the list (give the absolute starting node of the list if the length of the whole list is needed).
-    // RETURN:
-    //   - the length between the starting node and the ending node.
-    if (start->is_null) {
-        return 0;
-    }
-
-    int count = 1;
-    LinkedNode* result = start;
-    while (!(result->is_end)){
-        result = result->next;
-        count ++;
-    }
-    return count;
-}
-
-// A structure to store the cleanup information including a list of file descriptors and a list of pointers.
-typedef struct {
-    LinkedNode* files; // files to be closed
-    LinkedNode* pointers; // pointers to be free
-} CleanupData;
-
-
-void cleanup(CleanupData* cleanup_data){
-    // close all files and free all pointers.
-    // PARAM:
-    //   - cleanup_data: a reference of the CleanupData for this program.
-    // RETURN:
-    //   - void.
-
-    int files_len = linked_list_length(cleanup_data->files);
-    LinkedNode* files_node = cleanup_data->files;
-    for (int i = 0; i < files_len; i++){
-        int* file_desc = (int*) files_node->data;
-        close(*file_desc);
-        files_node = files_node->next;
-    }
-
-    int pointers_len = linked_list_length(cleanup_data->pointers);
-    LinkedNode* pointers_node = cleanup_data->pointers;
-    for (int i = 0; i < pointers_len; i++){
-        free(pointers_node->data);
-        pointers_node = pointers_node->next;
-    }
-}
-
-void die(char message[], int status, CleanupData* cleanup_data){
-    // writes message to stderr and cleanup, then exit with status code passed in to this function
-
-    write(STDERR ,PROGRAM_NAME, strlen(PROGRAM_NAME));
-    write(STDERR ,": ", 2);
+void error(char message[]){
+    // all error will have the program name and a colon as it's prefix to show the error was originated from this program.
+    write(STDERR, PROGRAM_NAME, strlen(PROGRAM_NAME));
+    write(STDERR, ": ", 2);
     write(STDERR, message, strlen(message));
-    write(STDERR, "\n", 1);
-    cleanup(cleanup_data);
-    exit(status);
 }
 
-void initialize_file(int* file_fd, int file_mode, char* filename, int permission, CleanupData* cleanup_data){
+int initialize_file(int* file_fd, int file_mode, char* filename, int permission){
     *file_fd = open(filename, file_mode, permission);
     if (*file_fd < 0){
-        // show err msg and die if file is not accessable
-        int msg_length = 17 + strlen(filename);
+        // show err msg if file is not accessable
+
+        // construct message
+        int msg_length = 52 + strlen(filename);
         char err_message[msg_length];
         strcpy(err_message, "");
         strcat(err_message, "cannot access '");
         strcat(err_message, filename);
-        strcat(err_message, "'\n");
-        die(err_message, 1, cleanup_data);
+        strcat(err_message, "': No such file or permission denied\n");
+
+        // print message to stderr
+        error(err_message);
+        return 0;
     }
+    return 1;
+}
+
+int test_numerical_string(char message[]){
+    // 1:success, 0:failed
+    int has_num = false;
+    for(int i = 0; i < strlen(message); i++){
+        if (message[i] > '9' || message[i] < '0'){
+            return 0;
+        }
+        else {
+            has_num = true;
+        }
+    }
+    return has_num;
+}
+
+int test_flag_a(char* c){
+    // 0: not flag, 1: is flag a
+    return strcmp(c, FLAG_A) == 0;
+}
+
+int test_flag_n(char* c){
+    // 0: not flag, 1: is flag n
+    return strcmp(c, FLAG_N) == 0;
+}
+
+int parse_arguments(int argc, char* argv[], char** source_filename){
+    // 0 success, 1 failed
+
+    // if no arguments, return success
+    if (argc <= 1){
+        return 0;
+    }
+
+    // current arg index
+    int current = 1;
+
+    // check if the first argument has a source name
+        
+    if (!test_flag_a(argv[1]) && !test_flag_n(argv[1])){
+        // assign source filename to the source_filename variable
+        *source_filename = (char*) malloc(sizeof(char) * strlen(argv[1])); // reallocate sourcefile to have the same length of argv1
+        strcpy(*source_filename, argv[1]);
+        current ++;
+    }
+
+    // parse -a and -n flags
+    int in_a_flag = false; // waiting for destination filename
+    int in_n_flag = false; // waiting for word count in integer
+    int a_done = false; // already collected for -a
+    int n_done = false; // already collected for -n
+    // for all other arguments
+    // the variable "current" starts from 1 if there are no source file specified, starts from 2 if source file are specified
+    for (; current < argc; current ++){
+        // if it is the first time encountering -a
+        char* current_arg = argv[current];
+        if (test_flag_a(current_arg) || !(in_a_flag || a_done)){
+            // first time seeing -a
+            in_a_flag = true;
+            continue;
+        }
+        
+        if (test_flag_a(current_arg) && a_done){
+            // -a appread again while it is already defined, print error
+            char* e = "-a cannot be specified twice"; // temp var for err message
+            
+            return true;
+        }
+
+        // if it is expecting a filename
+        if (in_a_flag && !a_done){
+
+        }
+    }
+
+    return false;
 }
 
 int main(int argc, char* argv[]){
-    printf("a");
     // ===== PROGRAM PREPARE STAGE
     // define constants
     int source_file_mode = O_RDONLY;
-    int destination_file_mode = O_WRONLY | O_CREAT;
+    int destination_file_mode = O_WRONLY | O_CREAT | O_APPEND;
     int destination_file_permission = 0664;
-
-    // define cleanup struct. files and pointers in this struct will be closed and freed automatically by cleanup()
-    CleanupData cleanup_data;
-    LinkedNode files_descriptors;
-    LinkedNode heap_pointers;
-    initialize_new_node(&files_descriptors);
-    initialize_new_node(&heap_pointers);
-    cleanup_data.files = &files_descriptors;
-    cleanup_data.pointers = &heap_pointers;
+    int exit_status = 0;
     
     // define fallback values for when they are not given through the cli argments.
     char fallback_source_filename[] = "sample.txt";
@@ -187,25 +133,66 @@ int main(int argc, char* argv[]){
 
     // read and parse argv
     int append_flag = false;
-    char destination_filename[] = "1";
-    char source_filename[strlen(fallback_source_filename)];
+    char* destination_filename = (char*) malloc(sizeof(char));
+    char* source_filename = (char*) malloc(sizeof(char) * strlen(fallback_source_filename));
     strcpy(source_filename, fallback_source_filename);
     int word_count = fallback_word_count;
+    if (parse_arguments(argc, argv, &source_filename)){
+        goto cleanup;
+    };
 
     // prepare and open source file
     int fd_source_file;
-    initialize_file(&fd_source_file, source_file_mode, source_filename, 0, &cleanup_data);
-    LinkedNode fd_source_file_node;
-    linked_list_append_node(&files_descriptors, &fd_source_file_node, &fd_source_file);
-
-    // prepare and open destination file if applicable
-    int fd_destination_file;
-    LinkedNode fd_destination_file_node;
-    if (!append_flag){
-        initialize_file(&fd_destination_file, destination_file_mode, destination_filename, destination_file_permission, &cleanup_data);
-        linked_list_append_node(&files_descriptors, &fd_destination_file_node, &fd_destination_file);
+    if(!initialize_file(&fd_source_file, source_file_mode, source_filename, 0)){
+        // exit 1 if initalize_file returned true; Error message is already written to stderr in the function.
+        exit_status = 1;
+        goto cleanup;
     }
 
-    return 0;
+    // prepare and open destination file if applicable. Default to STDOUT.
+    int fd_destination_file = STDOUT;
+    if (append_flag){
+        if (!initialize_file(&fd_destination_file, destination_file_mode, destination_filename, destination_file_permission)){
+            // exit 1 if initalize_file returned true; Error message is already written to stderr in the function.
+            exit_status = 1;
+            goto cleanup;
+        }
+    }
+
+    // ===== MAIN PROGRAM FUNCTION
+
+    char buffer[1];
+    int current_word_count = 0;
+    int current_space = true; // check if there are multiple spaces occuring next to each other.
+    while (current_word_count < word_count){
+        int success_size = read(fd_source_file, buffer, 1);
+        if (!success_size){
+            break;
+        }
+        write(fd_destination_file, buffer, success_size);
+        if (current_space && (buffer[0] != ' ')){
+            current_space = false;
+        }
+        if ((!current_space) && (buffer[0] == ' ')){
+            current_space = true;
+            current_word_count ++;
+        }
+    }
+
+    goto cleanup;
+    
+    // ===== CLEANUP STAGE
+    cleanup:
+
+    // close source file, and append file if applicable
+    close(fd_source_file); 
+    if (append_flag) close(fd_destination_file);
+
+    // free heap memories
+    free(source_filename);
+    free(destination_filename);
+
+    // exit with exit status.
+    return exit_status; 
 }
 
