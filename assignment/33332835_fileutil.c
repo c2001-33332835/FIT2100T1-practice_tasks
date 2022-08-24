@@ -14,6 +14,7 @@
 #define PROGRAM_NAME "fileutil"
 #define FLAG_A "-a"
 #define FLAG_N "-n"
+#define BUFFER_BLOCK_SIZE 32
 
 // naming convensions: snake_case for globals/locals/statics and functions. CapitalizedName for struct names.
 void error(char message[]){
@@ -21,6 +22,7 @@ void error(char message[]){
     write(STDERR, PROGRAM_NAME, strlen(PROGRAM_NAME));
     write(STDERR, ": ", 2);
     write(STDERR, message, strlen(message));
+    write(STDERR, "\n", 1);
 }
 
 int initialize_file(int* file_fd, int file_mode, char* filename, int permission){
@@ -29,12 +31,12 @@ int initialize_file(int* file_fd, int file_mode, char* filename, int permission)
         // show err msg if file is not accessable
 
         // construct message
-        int msg_length = 52 + strlen(filename);
+        int msg_length = 51 + strlen(filename);
         char err_message[msg_length];
         strcpy(err_message, "");
         strcat(err_message, "cannot access '");
         strcat(err_message, filename);
-        strcat(err_message, "': No such file or permission denied\n");
+        strcat(err_message, "': No such file or permission denied");
 
         // print message to stderr
         error(err_message);
@@ -48,7 +50,7 @@ int test_numerical_string(char message[]){
     int has_num = false;
     for(int i = 0; i < strlen(message); i++){
         if (message[i] > '9' || message[i] < '0'){
-            return 0;
+            return false;
         }
         else {
             has_num = true;
@@ -67,7 +69,7 @@ int test_flag_n(char* c){
     return strcmp(c, FLAG_N) == 0;
 }
 
-int parse_arguments(int argc, char* argv[], char** source_filename){
+int parse_arguments(int argc, char* argv[], char** source_filename, char** destination_filename, int* word_count, int* append_flag){
     // 0 success, 1 failed
 
     // if no arguments, return success
@@ -82,7 +84,7 @@ int parse_arguments(int argc, char* argv[], char** source_filename){
         
     if (!test_flag_a(argv[1]) && !test_flag_n(argv[1])){
         // assign source filename to the source_filename variable
-        *source_filename = (char*) malloc(sizeof(char) * strlen(argv[1])); // reallocate sourcefile to have the same length of argv1
+        realloc(*source_filename ,sizeof(char) * strlen(argv[1])); // reallocate sourcefile to have the same length of argv1
         strcpy(*source_filename, argv[1]);
         current ++;
     }
@@ -95,9 +97,10 @@ int parse_arguments(int argc, char* argv[], char** source_filename){
     // for all other arguments
     // the variable "current" starts from 1 if there are no source file specified, starts from 2 if source file are specified
     for (; current < argc; current ++){
-        // if it is the first time encountering -a
         char* current_arg = argv[current];
-        if (test_flag_a(current_arg) || !(in_a_flag || a_done)){
+
+        // if it is the first time encountering -a
+        if (test_flag_a(current_arg) && !(in_a_flag || a_done)){
             // first time seeing -a
             in_a_flag = true;
             continue;
@@ -105,17 +108,80 @@ int parse_arguments(int argc, char* argv[], char** source_filename){
         
         if (test_flag_a(current_arg) && a_done){
             // -a appread again while it is already defined, print error
-            char* e = "-a cannot be specified twice"; // temp var for err message
-            
+            error("-a cannot be specified more then once");
             return true;
         }
 
         // if it is expecting a filename
         if (in_a_flag && !a_done){
-
+            // if it recieved another flag
+            if (test_flag_a(current_arg) || test_flag_n(current_arg)){
+                error("filename expected after -a option");
+                return true;
+            }
+            
+            // set destination file name and set a to done.
+            realloc(*destination_filename, sizeof(char) * strlen(current_arg));
+            strcpy(*destination_filename, current_arg);
+            *append_flag = true;
+            a_done = true;
+            continue;
         }
+
+        // if it is the first time encountering -n
+        if (test_flag_n(current_arg) && !(in_n_flag || n_done)){
+            // first time seeing -n
+            in_n_flag = true;
+            continue;
+        }
+
+        if (test_flag_n(current_arg) && n_done){
+            // -n appeared again while it is already defined, print error
+            error("-n cannot be specified more then once");
+            return true;
+        }
+        
+        // if it is expecting a number
+        if (in_n_flag && !n_done){
+            // test if number is valid
+            if (!test_numerical_string(current_arg)){
+                // it contains other chars then positive integers.
+                char* err = "' is not a valid positive number. Word count has to be a positive integer number.";//temp var stores the error msg;
+                char err_full[strlen(err) + strlen(current_arg) + 1];//temp var stores the error msg;
+                strcpy(err_full, "'");
+                strcat(err_full, current_arg);
+                strcat(err_full, err);
+                error(err_full);
+                return true;
+            }
+
+            // set the word count and n_done to true
+            *word_count = atoi(current_arg);
+            n_done = true;
+            continue;
+        }
+
+        // check if argument does not fall into any categories.
+        char* err = "unexpected argument: '"; //temp error
+        char err_full[strlen(err) + strlen(current_arg) + 1];
+        strcpy(err_full, err);
+        strcat(err_full, current_arg);
+        strcat(err_full, "'");
+        error(err_full);
+        return true;
     }
 
+    // final check partially initalized flag
+    if (in_a_flag && !a_done){
+        // check for partially inited -a
+        error("filename must be specified after -a option");
+        return true;
+    }
+    if (in_n_flag && !n_done){
+        // check for partially inited -n
+        error("word count must be specified after -n option");
+        return true;
+    }
     return false;
 }
 
@@ -137,7 +203,7 @@ int main(int argc, char* argv[]){
     char* source_filename = (char*) malloc(sizeof(char) * strlen(fallback_source_filename));
     strcpy(source_filename, fallback_source_filename);
     int word_count = fallback_word_count;
-    if (parse_arguments(argc, argv, &source_filename)){
+    if (parse_arguments(argc, argv, &source_filename, &destination_filename, &word_count, &append_flag)){
         goto cleanup;
     };
 
