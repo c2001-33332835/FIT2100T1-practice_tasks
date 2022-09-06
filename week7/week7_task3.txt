@@ -1,0 +1,4 @@
+output: ABBCC or ABCBC
+1) the A will always come first (from parent)
+2) there will always be a c at the end, and will always come from parent
+3) only one A will be printed.

@@ -1,0 +1,25 @@
+No matter what limit is, FIT2100 will print once.
+
+=== when limit is 2:
+
+Operating * 3, System * 4
+It loops 2 times
+The first time, 1 process: Operating * 1
+The Second time, 2 processes: Operating * 2
+Outside the loop, 4 processes: System * 4
+
+=== When limit is 1:
+Operating * 1, System * 2
+
+=== When limit is 3:
+Operating * 7, System * 8
+
+=== When increase the limit to n:
+
+Operating * (\Sigma_{i=0}^(n-1)2^i), System * 2^n
+
+the first time: 1 process: Operating * 1
+the second time: 2 processes: Operating * 2
+...
+the n-th time: 2^(n-1) processes: Operating * 2^(n-1)
+Outside the loop: 2^n processes: System * 2^n
