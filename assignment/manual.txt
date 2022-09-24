@@ -1,0 +1,115 @@
+Non technical manual:
+
+Description of program:
+    This program is a program to read a file for a certain amount of words, and output them into a file or to the terminal standard output.
+
+Defination of a "word":
+    In this program, a word is any non-space characters surround with a spacial surrounding by white spaces (Including Space character, New Line (LF), Carriage Return (CR), and Horizontal Tab (HT)).
+    When there are 2 white space character surrounded, it will be treated like one white space
+
+    for example:
+    "hello world" is 2 words
+    "hello  world" is 2 words
+
+Compile and Installation:
+    This C program is compatible to Linux machines
+    The following distributions are tested:
+     - Ubuntu (Debian, Monash Student VM)
+     - Manjaro (Arch)
+     - Windows Subsystem for Linux 2 (Arch distribution)
+    
+    Unknown issue might occure if you are using any other distribution of Linux, or on other platform such as Windows or Mac.
+    
+    Compile instruction:
+     1 - Download install the gcc C compiler (steps may be different if a different compiler is used)
+     2 - Compile the C file with the compiler
+       2.1 - Use this command: 'gcc <33332835_fileutil.c> -w -o fileutil'
+     3 - Optional: Copy or Link the output 'fileutil' binary to /usr/bin/
+     
+    If you moved to /usr/bin, you can execute this command anywhere by calling fileutil
+    If not, you have to be in the directory of the binary, and execute ./fileutil instead.
+
+How to use:
+    After successfuly compile and install (see Compile and Installation), you can run the executable directly.
+    
+    $ ./fileutil
+
+    This will read 10 characters from 'sample.txt', and print it to the standard input.
+
+    If you want it to read from another file, specify the file name after the command.
+    For example, to read from example.txt instad of sample.txt:
+
+    $ ./fileutil example.txt
+
+    Note that the filename to read has to go directly after the command, and cannot have anything in between.
+
+    If you wish to read a specific certain amount of words instead of 10, use the '-n' option to specify.
+    For example, the following command reads 20 words from sample.txt
+
+    $ ./fileutil -n 10
+
+    If you wish to read, but instead of showing the result in terminal standard output, you wish to append the result into another file, use '-a' option to specify.
+    For example, the following command reads 10 words from sample.txt and appends to the file example.txt
+
+    $ ./fileutil -a example.txt
+
+    If the output file does not exist, it will be automatically created upon command execution. The newly created file will have Read and Write permission.
+    When successfuly appended to the output file, "Append successful" will be displayed.
+    Input file and output file can be the same file.
+
+    Input file, '-a' and '-n' file can be used together in one command:
+    The following command reads 20 words from example.txt and appends to sample.txt
+
+    $ ./fileutil example.txt -a sample.txt -n 20
+
+    Please note the input filename has to go directly after fileutil command, but -a and -n options can swap place
+
+    Error will occure if:
+     - Input file specified, but does not exist
+     - sample.txt not exist, but no other input file specified
+     - Program has no permission to read the input file
+     - Program has no permission to write to the output file
+     - Mistaken command syntax
+       - no number specified after -n option
+       - no filename specified after -a option
+       - specified -a or -n more then once
+
+
+===================================================================================================================================
+
+
+Linux man page styled manual:
+NAME
+    fileutil - a file utility program to read and write file.
+
+SYNOPSIS
+    fileutil
+    fileutil [OPTION]...
+    fileutil SOURCE [OPTION]...
+
+DESCRIPTION
+    Reads 10 words seperated by spaces (Including Space, LF, CR, HT) from 'sample.txt' and prints to the terminal output.
+    SOURCE can be specified, and the program will read from SOURCE rather then 'sample.txt'
+    The following OPTIONs can be used and the behaviour of the program will be modified.
+
+    -n word_count
+        override the number of words to be read from the source file
+
+    -a destination_file
+        instead of printing the result into terminal output (STDOUT), appends to the specified destination_file.
+
+    Exit status:
+        0 - Program executed as expected
+        1 - Program exited with an error
+
+AUTHOR
+   Written by Xuanao Zhao (Student ID 33332835). 
+
+COPYRIGHT
+    Copyright (c) 2022 Xuanao Zhao
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
