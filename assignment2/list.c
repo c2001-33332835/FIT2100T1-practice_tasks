@@ -36,6 +36,19 @@ linked_node_t* list_create(void* data){
     return new_node;
 }
 
+linked_node_t* list_create_size(int size){
+    linked_node_t* new_node = (linked_node_t*) malloc(sizeof(linked_node_t));
+    new_node->content = NULL;
+    new_node->start = 1;
+    new_node->end = 1;
+    
+    for (int i = 1; i < size; i ++){
+        list_append_node(new_node, NULL);
+    }
+    
+    return new_node;
+}
+
 void list_free(linked_node_t* node){
     linked_node_t* start = list_get_start_node(node);
     while (!start->end){
@@ -54,21 +67,27 @@ void list_remove_last(linked_node_t* node){
 }
 
 void list_set_item(linked_node_t* node, int index, void* data){
-    
+    list_get_node(node, index)->content = data;
 }
 
-void* list_get_node(linked_node_t* node, int index){
+linked_node_t* list_get_node(linked_node_t* node, int index){
+    linked_node_t* curr = list_get_start_node(node);
 
+    for (int i = 0; i != index && !curr->end; i++){
+        curr = curr->next;
+    }
+    return curr;
 }
 
 void* list_get_item(linked_node_t* node, int index){
-
-}
-
-linked_node_t* list_slice(linked_node_t* node, int start, int end){
-
+    return list_get_node(node, index)->content;
 }
 
 unsigned list_length(linked_node_t* node){
-
+    unsigned len;
+    linked_node_t* curr = list_get_start_node(node);
+    for (len = 1; !curr->end; len++){
+        curr = curr->next;
+    }
+    return len;
 }
