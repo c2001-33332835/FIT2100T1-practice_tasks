@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.log": "plaintext",
+        "stdlib.h": "c"
+    }
+}
