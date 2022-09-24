@@ -1,0 +1,20 @@
+TASK2:
+
+Q2a)
+
+It is not possible to get a value >52 or <48
+
+Q2b)
+This is to simulate calculation delays and manually trigger data racing.
+There will be a few situation:
+ - One thread gets the value, modify and return back to gloabl, then the next thread begins, in this case, value is added, then minused. Value will be 50
+ - One thread gets the value, modify, and the second thread gets the value and modify.
+   - 1/2 chance where thread1 will replace global first and then the global is override by thread2
+   - 1/2 chance where thread2 will replace global before thread1, and will be overriden by thread1
+   Either case the final value is 48 or 52
+
+Q2c)
+We cannot predict the output unless we fully inspect the procedures the computer schedules, which is not practical.
+
+Q2d)
+One thread has to get the global value after another thread has returned the val back to global
