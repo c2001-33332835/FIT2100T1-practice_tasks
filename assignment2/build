@@ -1,0 +1,5 @@
+#!/usr/bin/sh
+
+gcc test.c list.c process_file.c string_utils.c -o test
+./test
+rm test
