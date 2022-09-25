@@ -3,6 +3,11 @@
         "*.log": "plaintext",
         "stdlib.h": "c",
         "stdio.h": "c",
-        "string_utils.h": "c"
+        "string_utils.h": "c",
+        "fcntl.h": "c",
+        "unistd.h": "c",
+        "*.tcc": "c",
+        "process_file.h": "c",
+        "list.h": "c"
     }
 }
