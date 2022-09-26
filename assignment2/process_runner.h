@@ -1,5 +1,5 @@
-#ifndef PROCESS_STRUCT_H
-#define PROCESS_STRUCT_H
+#ifndef PROCESS_RUNNER_H
+#define PROCESS_RUNNER_H
 
 typedef enum {
     READY, RUNNING, EXIT
@@ -14,5 +14,7 @@ typedef struct {
 
     process_state_t status;
 } pcb_t;
+
+
 
 #endif
