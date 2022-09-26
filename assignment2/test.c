@@ -1,27 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #include "list.h"
+#include "string_utils.h"
+#include "process_file.h"
 
 #define castpointerval(T, V) *((T*)(V))
+#define castpointer(T, V) ((T*)(V))
 #define malloctype(T, M) ((T*) malloc(M * sizeof(T)))
 #define in_range(I, MAX) (int I = 0; I < MAX; I++)
 
 int main(void){
+    int fd = open("processes.txt", O_RDONLY);
+    linked_node_t* records = pf_read_source_file(fd);
 
-    linked_node_t* list_a = list_create_size(10);
-
-    for in_range(i, 10) {
-        int* data = malloctype(int, 1);
-        *data = i;
-        list_set_item(list_a, i, data);
+    for (int i = 0; i < list_length(records); i++){
+        process_record_t* record = castpointer(process_record_t, list_get_item(records, i));
+        char* c = pf_print_record(record);
     }
-
-    list_remove_last(list_a);
-
-    // printf("%d", castpointerval(int ,list_a->content));
-    printf("%d", castpointerval(int ,list_get_item(list_a, 100)));
-
-    return 0;
-
-    list_free(list_a);
 }
