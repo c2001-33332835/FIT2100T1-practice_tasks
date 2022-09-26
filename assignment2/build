@@ -1,5 +1,5 @@
 #!/usr/bin/sh
 
-gcc test.c list.c process_file.c string_utils.c -o test -w -lm
+gcc test.c list.c process_record.c string_utils.c -o test -w -lm
 ./test
 rm test

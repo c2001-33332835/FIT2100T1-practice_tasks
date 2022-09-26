@@ -2,11 +2,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "process_file.h"
+#include "process_record.h"
 #include "list.h"
 #include "string_utils.h"
 
-linked_node_t* pf_read_source_file(int fd){
+linked_node_t* pr_read_source_file(int fd){
     /**/
     
     // read file content into raw (a temporary file storage)
@@ -31,7 +31,7 @@ linked_node_t* pf_read_source_file(int fd){
     linked_node_t* process_records = list_create_empty();
     for (int i = 0; i < list_length(lines); i++){
         char* line = (char*) list_get_item(lines, i);
-        process_record_t* record = pf_parse_record_line(line);
+        process_record_t* record = pr_parse_record_line(line);
         list_append_node(process_records, record);
     }
 
@@ -42,7 +42,7 @@ linked_node_t* pf_read_source_file(int fd){
     return process_records;
 }
 
-process_record_t* pf_parse_record_line(char* line){
+process_record_t* pr_parse_record_line(char* line){
     /**/
 
     // split line with spaces
@@ -71,7 +71,7 @@ process_record_t* pf_parse_record_line(char* line){
     return record;
 }
 
-void* pf_print_record(process_record_t* record){
+void* pr_print_record(process_record_t* record){
     char* name = record->process_name;
     int arrive = record->arrive_time;
     int service = record->service_time;
