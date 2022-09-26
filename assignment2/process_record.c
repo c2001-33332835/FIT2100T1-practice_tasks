@@ -71,6 +71,41 @@ process_record_t* pr_parse_record_line(char* line){
     return record;
 }
 
+void pr_sort_records(linked_node_t* records, process_record_field_t sort_by, int asc){
+    // bubble sort
+    unsigned record_length = list_length(records);
+    for (int end = record_length; end > 0; end--){
+        for (int i = 0; i < end; i++){
+            process_record_t* r1 = (process_record_t*)(list_get_item(records, i));
+            process_record_t* r2 = (process_record_t*)(list_get_item(records, i+1));
+            
+            int swap = 0;
+            switch (sort_by){
+                case PR_NAME:
+                    swap = str_ordercmp(r1->process_name, r2->process_name) == 1;
+                case PR_ARRIVE:
+                    swap = r1->arrive_time > r2->arrive_time;
+                case PR_SERVICE:
+                    swap = r1->service_time > r2->service_time;
+                case PR_DEADLINE:
+                    swap = r1->deadline > r2->deadline;
+                default:
+                    break;
+            }
+
+            if (swap){
+                // swap place if required.
+                linked_node_t* n1 = list_get_node(records, i);
+                linked_node_t* n2 = list_get_node(records, i+1);
+                
+                void* temp = n1->content;
+                n1->content = n2->content;
+                n2->content = temp;
+            }
+        }
+    }
+}
+
 void* pr_print_record(process_record_t* record){
     char* name = record->process_name;
     int arrive = record->arrive_time;

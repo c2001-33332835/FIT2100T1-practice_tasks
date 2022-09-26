@@ -11,11 +11,10 @@
 #define in_range(I, MAX) (int I = 0; I < MAX; I++)
 
 int main(void){
-    int fd = open("processes.txt", O_RDONLY);
-    linked_node_t* records = pr_read_source_file(fd);
-
-    for (int i = 0; i < list_length(records); i++){
-        process_record_t* record = castpointer(process_record_t, list_get_item(records, i));
-        char* c = pr_print_record(record);
-    }
+    int result1 = str_ordercmp("P1", "P2");
+    int result2 = str_ordercmp("P2", "P1");
+    int result3 = str_ordercmp("P1", "P1");
+    printf("P1, P2 %d\n", result1);
+    printf("P2, P1 %d\n", result2);
+    printf("P1, P1 %d\n", result3);
 }

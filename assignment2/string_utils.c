@@ -22,3 +22,27 @@ linked_node_t* str_split(char* source, char deliminater){
     }
     return result;
 }
+
+int str_ordercmp(char* x, char* y){
+    // 0 = eq, 1 = x > y, -1 = y > x
+
+    int lx = strlen(x); // length of x
+    int ly = strlen(y); // length of y
+    int cmpmax = (lx > ly) ? ly : lx; // shorter value as maximum cmp length
+    
+    for (int i = 0; i < cmpmax; i ++){
+        // compare each char, until x > y or y > x
+        char cx = x[i];
+        char cy = y[i];
+        if (cx == cy){
+            continue;
+        }
+        return (cx > cy) ? 1 : -1;
+    }
+
+    // if all char with in maximum cmp length is the same, 
+    // longer string is greater
+
+    if (lx == ly) return 0;
+    return (lx > ly) ? 1 : -1;
+}

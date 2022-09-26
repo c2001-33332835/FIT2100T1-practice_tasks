@@ -22,5 +22,7 @@ void list_set_item(linked_node_t* node, int index, void* data);
 void* list_get_item(linked_node_t* node, int index);
 linked_node_t* list_get_node(linked_node_t* node, int index);
 unsigned list_length(linked_node_t* node);
+void list_reverse(linked_node_t* node);
+linked_node_t* list_duplicate(linked_node_t* node);
 
 #endif

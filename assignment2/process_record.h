@@ -9,8 +9,13 @@ typedef struct process_record {
     int deadline;
 } process_record_t;
 
+typedef enum {
+    PR_NAME, PR_ARRIVE, PR_SERVICE, PR_DEADLINE
+} process_record_field_t;
+
 linked_node_t* pr_read_source_file(int fd);
 process_record_t* pr_parse_record_line(char* line);
+void pr_sort_records(linked_node_t* records, process_record_field_t sort_by, int asc);
 char* pr_record_to_str(process_record_t* record);
 
 #endif

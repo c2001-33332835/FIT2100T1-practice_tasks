@@ -59,7 +59,7 @@ linked_node_t* list_create_size(int size){
     return new_node;
 }
 
-linked_node_t* list_create_empty(int size){
+linked_node_t* list_create_empty(){
     linked_node_t* new_node = (linked_node_t*) malloc(sizeof(linked_node_t));
     new_node->content = NULL;
     new_node->start = 1;
@@ -119,4 +119,42 @@ unsigned list_length(linked_node_t* node){
         curr = curr->next;
     }
     return len;
+}
+
+void list_reverse(linked_node_t* node){
+    if (node->empty){
+        return;
+    }
+
+    linked_node_t* start = list_get_start_node(node);
+    list_reverse_r(start);
+}
+
+void list_reverse_r(linked_node_t* node){
+    if (node->start){
+        node->start = 0;
+        node->end = 1;
+    }
+    else if (node->end){
+        node->start = 1;
+        node->end = 0;
+    }
+
+    // swap next and prev
+    linked_node_t* temp = node->prev;
+    node->prev = node->next;
+    node->next = temp;
+
+    if (node->start){
+        return;
+    }
+
+    list_reverse_r(node->prev);
+}
+
+linked_node_t* list_duplicate(linked_node_t* node){
+    linked_node_t* new = list_create_empty();
+    for (int i = 0; i < list_length(node); i++){
+        
+    }
 }
