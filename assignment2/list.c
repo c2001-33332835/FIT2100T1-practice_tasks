@@ -77,12 +77,28 @@ void list_free(linked_node_t* node){
     list_remove_last(start);
 }
 
+void list_free_nodes(linked_node_t* node){
+    linked_node_t* start = list_get_start_node(node);
+    while (!start->end){
+        list_remove_last_node(start);
+    }
+    list_remove_last_node(start);
+}
+
 void list_remove_last(linked_node_t* node){
     linked_node_t* end = list_get_last_node(node);
     if (!end->start){
         end->prev->end = 1;
     }
     free(end->content);
+    free(end);
+}
+
+void list_remove_last_node(linked_node_t* node){
+    linked_node_t* end = list_get_last_node(node);
+    if (!end->start){
+        end->prev->end = 1;
+    }
     free(end);
 }
 
