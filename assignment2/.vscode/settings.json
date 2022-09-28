@@ -8,6 +8,8 @@
         "unistd.h": "c",
         "*.tcc": "c",
         "process_file.h": "c",
-        "list.h": "c"
+        "list.h": "c",
+        "process_record.h": "c",
+        "process_runner.h": "c"
     }
 }
