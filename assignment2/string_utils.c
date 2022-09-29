@@ -4,7 +4,8 @@
 
 linked_node_t* str_split(char* source, char deliminater){
     linked_node_t* result = list_create_empty();
-    char buffer[strlen(source)];
+    char buffer[strlen(source) + 1];
+    buffer[strlen(source)] = "\0";
     strcpy(buffer, "");
     char c[2];
     c[1] = '\0';

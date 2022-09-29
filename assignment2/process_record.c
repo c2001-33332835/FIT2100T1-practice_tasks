@@ -106,7 +106,7 @@ void pr_sort_records(linked_node_t* records, process_record_field_t sort_by, int
     }
 }
 
-void* pr_print_record(process_record_t* record){
+void pr_print_record(process_record_t* record){
     char* name = record->process_name;
     int arrive = record->arrive_time;
     int service = record->service_time;

@@ -171,6 +171,7 @@ void list_reverse_r(linked_node_t* node){
 linked_node_t* list_duplicate(linked_node_t* node){
     linked_node_t* new = list_create_empty();
     for (int i = 0; i < list_length(node); i++){
-        
+        list_append_node(new, list_get_item(node, i));
     }
+    return new;
 }
