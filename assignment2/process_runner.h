@@ -16,7 +16,7 @@ typedef struct {
     process_state_t status;
 } pcb_t;
 
-void run_processes(linked_node_t* processes);
+void run_processes_fcfs(linked_node_t* processes);
 linked_node_t* next_processes(int t, linked_node_t* processes);
 
 #endif

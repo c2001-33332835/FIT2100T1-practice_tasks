@@ -15,5 +15,5 @@
 int main(void){
     int fd = open("processes.txt", O_RDONLY);
     linked_node_t* processes = pr_read_source_file(fd);
-    run_processes(processes);
+    run_processes_fcfs(processes);
 }

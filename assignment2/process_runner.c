@@ -5,7 +5,7 @@
 #include "list.h"
 #include "process_record.h"
 
-void run_processes(linked_node_t* processes){
+void run_processes_fcfs(linked_node_t* processes){
     int finished = 0;
     unsigned time_iteration;
     unsigned process_count = list_length(processes);
