@@ -35,7 +35,6 @@ linked_node_t* pr_read_source_file(int fd){
         list_append_node(process_records, record);
     }
 
-    // free all temporary resources before return
     free(raw);
     list_free(lines);
 
@@ -83,12 +82,16 @@ void pr_sort_records(linked_node_t* records, process_record_field_t sort_by, int
             switch (sort_by){
                 case PR_NAME:
                     swap = str_ordercmp(r1->process_name, r2->process_name) == 1;
+                    break;
                 case PR_ARRIVE:
                     swap = r1->arrive_time > r2->arrive_time;
+                    break;
                 case PR_SERVICE:
                     swap = r1->service_time > r2->service_time;
+                    break;
                 case PR_DEADLINE:
                     swap = r1->deadline > r2->deadline;
+                    break;
                 default:
                     break;
             }

@@ -1,5 +1,13 @@
-#!/usr/bin/sh
+#!/usr/bin/bash
 
-gcc test.c list.c process_record.c string_utils.c logs.c process_runner.c -o test -w -lm
-./test
-rm test
+DEBUG=""
+if test "$1" = "-r"
+then
+    DEBUG="-g"
+fi
+gcc main.c list.c process_record.c string_utils.c logs.c process_runner.c -o main -w -lm $DEBUG
+if test "$1" != "-r"
+then
+    ./main $1
+    rm main
+fi

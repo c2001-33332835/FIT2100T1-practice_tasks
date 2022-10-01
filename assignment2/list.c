@@ -28,6 +28,7 @@ linked_node_t* list_append_node(linked_node_t* node, void* data){
 
     linked_node_t* new_node = (linked_node_t*) malloc(sizeof(linked_node_t));
     new_node->end = 1;
+    new_node->start = 0;
     new_node->prev = end;
     new_node->content = data;
     new_node->empty = 0;

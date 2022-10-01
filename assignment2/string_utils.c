@@ -47,3 +47,16 @@ int str_ordercmp(char* x, char* y){
     if (lx == ly) return 0;
     return (lx > ly) ? 1 : -1;
 }
+
+void int_count_digits(int n, int* result){
+    /* 
+     * This funtion contains code from the following URL:
+     * https://stackoverflow.com/questions/3068397/finding-the-length-of-an-integer-in-c
+     * By Jordan Lewis, 18th of June, 2010
+     * 
+     * Thus the content of this function does not license under MIT LICENSE.
+     * Jordan Lewis owns the copyright of the content of this function.
+     */
+
+    *result  = floor(log10(abs(n))) + 1;
+}

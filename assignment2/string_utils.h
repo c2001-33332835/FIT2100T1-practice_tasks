@@ -4,5 +4,6 @@
 
 linked_node_t* str_split(char* source, char deliminator);
 int str_ordercmp(char* x, char* y);
+void int_count_digits(int n, int* result);
 
 #endif

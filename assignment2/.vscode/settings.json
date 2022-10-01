@@ -10,6 +10,8 @@
         "process_file.h": "c",
         "list.h": "c",
         "process_record.h": "c",
-        "process_runner.h": "c"
+        "string.h": "c",
+        "process_runner.h": "c",
+        "logs.h": "c"
     }
 }
