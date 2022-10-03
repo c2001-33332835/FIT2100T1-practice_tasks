@@ -110,7 +110,7 @@ void log_pcb(pcb_t* block, log_functional_type_t log_type, int t, int output_fd)
                 printf("%s %s Has done execution and missed the deadline.\n", label, name);
             }
             else {
-                printf("%s %s Has done execution.\n", label, name);
+                printf("%s %s Has done execution and meets its deadline.\n", label, name);
             }
             break;
         case LOG_DEADLINEMISS:
