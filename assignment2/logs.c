@@ -51,7 +51,7 @@ void log_string(char* message, log_string_type_t log_type){
 };
 
 void log_iteration(int iteration){
-    printf("\n%c[30;1m[@t=%d]%c[0m\n", ESC, iteration, ESC);
+    printf("%c[30;1m[@t=%d]%c[0m\n", ESC, iteration, ESC);
 }
 
 void log_pcb(pcb_t* block, log_functional_type_t log_type, int t, int output_fd){
@@ -94,12 +94,12 @@ void log_pcb(pcb_t* block, log_functional_type_t log_type, int t, int output_fd)
             break;
         case LOG_SUSPENSION:
             label[4] = RED;
-            label[8] = '<';
+            label[8] = '*';
             printf("%s %s Has temporarly suspended.\n", label, name);
             break;
         case LOG_RESUME:
             label[4] = GREEN;
-            label[8] = '>';
+            label[8] = '*';
             printf("%s %s Has resumed execution.\n", label, name);
             break;
         case LOG_EXIT:
