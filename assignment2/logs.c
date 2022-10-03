@@ -67,7 +67,7 @@ void log_pcb(pcb_t* block, log_functional_type_t log_type, int t, int output_fd)
     int exit_time = block->exit_time;
     int wait_time = start_time - entry_time;
     int turnaround_time = exit_time - entry_time;
-    int deadline_missed = (t-entry_time) > deadline;
+    int deadline_missed = turnaround_time > deadline;
 
     if (log_type == LOG_EXIT){
         int wait_length;
