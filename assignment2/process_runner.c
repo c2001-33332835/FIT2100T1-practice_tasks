@@ -7,81 +7,102 @@
 #include "logs.h"
 #include "process_record.h"
 
-#define TIMEWAIT 1
+#define TIMEWAIT 0
 
 void pr_run_processes_fcfs(linked_node_t* processes, int output_fd){
-    int finished = 0;
-    unsigned process_count = list_length(processes);
-    linked_node_t* pcbs = list_create_empty();
-    int current_queue_position = 0;
-    unsigned time_iteration = 0;
-    int new_iteration = 1;
-    pcb_t* current_process;
-    while (finished < process_count){
-        // log iteration
-        if (new_iteration){
-            log_iteration(time_iteration);
-        }
-        
-        CURR_ROUND:
+    int total_process_count = (int) list_length(processes);
 
-        // Get arriving records, conevrt and store into pcbs.
-        linked_node_t* next = pr_next_processes(time_iteration, processes);
+    // create a list to store pcbs currently in system.
+    linked_node_t* pcbs = list_create_empty(); // execution queue
+    int time = 0; // the time iteration (t value).
+    int done = 0; // number of processes exitted.
+
+    while (1){
+        // log this iteration
+        log_iteration(time);
+
+        // check if there is new processes entering in thie new iteration
+        linked_node_t* next = pr_next_processes(time, processes);
         for (int i = 0; i < list_length(next); i++){
-            pcb_t* new_process = (pcb_t*) malloc(sizeof(pcb_t));
-            process_record_t* new_process_record = (process_record_t*) list_get_item(next, i);
-            strcpy(new_process->process_name, new_process_record->process_name);
-            new_process->entry_time = new_process_record->arrive_time;
-            new_process->remaining_time = new_process_record->service_time;
-            new_process->service_time = new_process_record->service_time;
-            new_process->deadline = new_process_record->deadline;
-            new_process->start_time = 0;
-            new_process->exit_time = 0;
-            new_process->status = PS_READY;
-            // put the new records in queue
-            list_append_node(pcbs, new_process);
-
-            log_pcb(new_process, LOG_ARRIVE, time_iteration, output_fd);
+            process_record_t* record = (process_record_t*) list_get_item(next, i);
+            pcb_t* process = pr_record_to_pcb(record);
+            process->entry_time = time;
+            list_append_node(pcbs, process);
+            log_pcb(process, LOG_ARRIVE, time, output_fd); // log this arrival event
         }
         list_free_nodes(next);
 
-        // check if any pending processes, if not, sleep this round and enter next round;
-        if (current_queue_position >= list_length(pcbs)){
-            goto NEXT_ROUND;
+        // check if any process in queue has missed their deadline now
+        for (int i = 0; i < list_length(pcbs); i++){
+            pcb_t* process = (pcb_t*) list_get_item(pcbs, i);
+            int elapsed = time - process->entry_time;
+            if (elapsed == process->deadline && process->remaining_time != 0){
+                log_pcb(process, LOG_DEADLINEMISS, time, output_fd);
+            }
         }
 
-        // Get currently running process
-        current_process = (pcb_t*) list_get_item(pcbs, current_queue_position);
+        CURRENT_ITERATION:
 
-        // Detect if the process is newly executing in this ruond.
-        if (current_process->remaining_time == current_process->service_time){
-            log_pcb(current_process, LOG_START, time_iteration, output_fd);
-            current_process->start_time = time_iteration;
-            current_process->status = PS_RUNNING;
+        // if queue is empty, continue to next iteration
+        if (list_length(pcbs) == 0){
+            goto NEXT_ITERATION;
         }
 
-        // Detect if the process has done execution in this round,
-        // if yes, repeat the round and get a new process
-        if (current_process->remaining_time == 0){
-            finished ++; // increase the finished processes counter
-            current_queue_position ++; // increase the index queue, to get next process
-            current_process->status = PS_EXIT; // update process status
-            current_process->exit_time = time_iteration; // update process status
-            log_pcb(current_process, LOG_EXIT, time_iteration, output_fd);
-            free(current_process);
-            goto CURR_ROUND; // repeat the same round
+        // first element in queue is the current process
+        pcb_t* current = (pcb_t*) list_get_item(pcbs, 0);
+
+        // check if the current process is starting
+        if (current->status == PS_READY){
+            current->status = PS_RUNNING;
+            current->start_time = time;
+            log_pcb(current, LOG_START, time, output_fd); // log this execution event
         }
 
-        NEXT_ROUND: 
+        // check if the process is exitting in this iteration
+        if (current->status == PS_RUNNING && current->remaining_time == 0){
+            current->exit_time = time;
+            current->status = PS_EXIT;
+            log_pcb(current, LOG_EXIT, time, output_fd); // log this exit event
+            done ++;
 
-        current_process->remaining_time --;
+            // remove this pcb from list
+            pcbs = list_remove_item(pcbs, 0);
+
+            // check if all processes has executed
+            if (done == total_process_count){
+                break;
+            }
+
+            // redo this iteration to get next starting event
+            goto CURRENT_ITERATION;
+        }
+
+        NEXT_ITERATION:
+
+        // increment time iteration by 1
         sleep(TIMEWAIT);
-
-        time_iteration++;
-        new_iteration = 1;
+        current->remaining_time --;
+        time++;
     }
 
-    list_free_nodes(pcbs);
+    list_free(pcbs);
+}
+
+void pr_run_processes_rr(linked_node_t* processes, int time_quant ,int output_fd){
+
+}
+
+pcb_t* pr_record_to_pcb(process_record_t* record){
+    pcb_t* pcb = (pcb_t*) malloc(sizeof(pcb_t));
+    strcpy(pcb->process_name, record->process_name);
+    pcb->entry_time = 0;
+    pcb->service_time = record->service_time;
+    pcb->remaining_time = record->service_time;
+    pcb->deadline = record->deadline;
+    pcb->start_time = 0;
+    pcb->exit_time = 0;
+    pcb->status = PS_READY;
+    return pcb;
 }
 
 linked_node_t* pr_next_processes(int t, linked_node_t* processes){
