@@ -20,6 +20,8 @@ void list_free(linked_node_t* node);
 void list_free_nodes(linked_node_t* node);
 void list_remove_last(linked_node_t* node);
 void list_remove_last_node(linked_node_t* node);
+linked_node_t* list_remove_item(linked_node_t* node, int index);
+linked_node_t* list_remove_node(linked_node_t* node, int index);
 void list_set_item(linked_node_t* node, int index, void* data);
 void* list_get_item(linked_node_t* node, int index);
 linked_node_t* list_get_node(linked_node_t* node, int index);

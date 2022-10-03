@@ -71,6 +71,12 @@ linked_node_t* list_create_empty(){
 }
 
 void list_free(linked_node_t* node){
+    // check if empty
+    if (node->empty){
+        free(node);
+        return;
+    }
+
     linked_node_t* start = list_get_start_node(node);
     while (!start->end){
         list_remove_last(start);
@@ -101,6 +107,57 @@ void list_remove_last_node(linked_node_t* node){
         end->prev->end = 1;
     }
     free(end);
+}
+
+linked_node_t* list_remove_item(linked_node_t* node, int index){
+    linked_node_t* target = list_get_node(node, index);
+    
+    // check if empty
+    if (target->empty){
+        return target;
+    }
+
+    free(target->content);
+    return list_remove_node(target, index);
+}
+
+linked_node_t* list_remove_node(linked_node_t* node, int index){
+    linked_node_t* target = list_get_node(node, index);
+    
+    // check if empty
+    if (target->empty){
+        return target;
+    }
+
+    // check if 1 element
+    if (list_length(target) == 1){
+        target->empty = 1;
+        target->start = 1;
+        target->end = 1;
+        return target;
+    }
+
+    // check if start
+    if (target->start){
+        linked_node_t* next = target->next;
+        next->start = 1;
+        free(target);
+        return next;
+    }
+
+    // check if end
+    if (target->end){
+        linked_node_t* prev = target->prev;
+        prev->end = 1;
+        free(target);
+        return prev;
+    }
+
+    // target is in middle, connect next and prev
+    target->next->prev = target->prev;
+    target->prev->next = target->next;
+    free(target);
+    return list_get_start_node(target);
 }
 
 void list_set_item(linked_node_t* node, int index, void* data){
