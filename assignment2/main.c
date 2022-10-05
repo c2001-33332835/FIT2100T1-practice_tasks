@@ -16,6 +16,7 @@
 
 #define FALLBACK_SOURCE "processes.txt"
 #define FALLBACK_REUSLT "results-tasknum.txt"
+#define RR_TIMEQUANT 2
 
 int load_file(linked_node_t** result, char* filename){
     /* 1 = success, 0 = failed */
@@ -84,15 +85,17 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
-    // run first come first serve algorithm
-    char* base_schedule_msg = "Scheduling %d process(es) with First Come First Serve (FCFS) Algorithm.";
+    char* base_schedule_msg = "Scheduling %d process(es) with Round robin (RR) Algorithm, with a time quantum of %d.";
     int process_count_length;
     int_count_digits(list_length(processes), &process_count_length);
-    char schedule_msg[strlen(base_schedule_msg) + process_count_length + 1];
-    sprintf(schedule_msg, base_schedule_msg, list_length(processes));
+    int tq_length;
+    int_count_digits(RR_TIMEQUANT, &tq_length);
+    char schedule_msg[strlen(base_schedule_msg) + tq_length + process_count_length + 1];
+    sprintf(schedule_msg, base_schedule_msg, list_length(processes), RR_TIMEQUANT);
     log_string(schedule_msg, LOG_STRDFLT);
 
-    pr_run_processes_fcfs(processes, output_fd);
+    // run round robin algorithm
+    pr_run_processes_rr(processes, RR_TIMEQUANT, output_fd);
 
     log_string("All processes exited.", LOG_STRDFLT);
 

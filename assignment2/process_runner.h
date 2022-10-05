@@ -5,7 +5,7 @@
 #include "process_record.h"
 
 typedef enum {
-    PS_READY, PS_RUNNING, PS_EXIT
+    PS_READY, PS_RUNNING, PS_EXIT, PS_PAUSED
 } process_state_t;
 
 typedef struct {

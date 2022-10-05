@@ -7,7 +7,7 @@
 #include "logs.h"
 #include "process_record.h"
 
-#define TIMEWAIT 0
+#define TIMEWAIT 1
 
 void pr_run_processes_fcfs(linked_node_t* processes, int output_fd){
     int total_process_count = (int) list_length(processes);
@@ -89,6 +89,96 @@ void pr_run_processes_fcfs(linked_node_t* processes, int output_fd){
 }
 
 void pr_run_processes_rr(linked_node_t* processes, int time_quant ,int output_fd){
+    int total_process_count = (int) list_length(processes);
+
+    // create a list to store pcbs currently in system.
+    linked_node_t* pcbs = list_create_empty(); // execution queue
+    int time = 0; // the time iteration (t value).
+    int done = 0; // number of processes exitted.
+    int quantprog = 0; // the current progress in a time quantum
+
+    while (1){
+        sleep(TIMEWAIT);
+        // log this iteration
+        log_iteration(time);
+
+        // check if there is new processes entering in thie new iteration
+        linked_node_t* next = pr_next_processes(time, processes);
+        for (int i = 0; i < list_length(next); i++){
+            process_record_t* record = (process_record_t*) list_get_item(next, i);
+            pcb_t* process = pr_record_to_pcb(record);
+            process->entry_time = time;
+            list_append_node(pcbs, process);
+            log_pcb(process, LOG_ARRIVE, time, output_fd); // log this arrival event
+        }
+        list_free_nodes(next);
+
+        CURRENT_ROUND:
+
+        // if no process arrived yet, skip iteration.
+        if (list_length(pcbs) == 0){
+            quantprog = 0;
+            goto NEXT_ROUND;
+        }
+
+        // get first pcb in queue
+        pcb_t* current = (pcb_t*) list_get_item(pcbs, 0);
+
+        // check if quantum has expired
+        if (quantprog >= time_quant && current->remaining_time != 0){
+            quantprog = 0;
+            // append current task to the end, and remove the current task
+            pcb_t* queue_process = (pcb_t*) list_get_item(pcbs, 0);
+            queue_process->status = PS_PAUSED;
+            log_pcb(queue_process, LOG_SUSPENSION, time, output_fd); // log pausing event
+            list_append_node(pcbs, queue_process);
+            pcbs = list_remove_node(pcbs, 0);
+            goto CURRENT_ROUND; // redo this round if quantum expired
+        }
+
+        // if first time running this process, start the process
+        if (current->status == PS_READY){
+            quantprog = 0;
+            current->status = PS_RUNNING;
+            current->start_time = time;
+            log_pcb(current, LOG_START, time, output_fd);
+        }
+
+        // if process is paused, resume the process
+        if (current->status == PS_PAUSED){
+            quantprog = 0;
+            current->status = PS_RUNNING;
+            log_pcb(current, LOG_RESUME, time, output_fd);
+        }
+
+        // if the process ends in this round
+        if (current->status == PS_RUNNING && current->remaining_time == 0){
+            done ++;
+            current->exit_time = time;
+            log_pcb(current, LOG_EXIT, time, output_fd);
+            pcbs = list_remove_node(pcbs, 0);
+            quantprog = 0;
+            goto CURRENT_ROUND; // redo this round to start executing the next process
+        }
+
+        // run the process if not finished, increase time quantum progress
+        if (current->status == PS_RUNNING){
+            current->remaining_time --;
+            goto NEXT_ROUND;
+        }
+
+
+        NEXT_ROUND:
+
+        // if all processes is executed
+        if (done >= total_process_count){
+            break;
+        }
+        quantprog ++;
+        time ++;
+    }
+
+    list_free(pcbs);
 
 }
 
