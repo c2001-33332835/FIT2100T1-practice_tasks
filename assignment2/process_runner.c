@@ -156,7 +156,7 @@ void pr_run_processes_rr(linked_node_t* processes, int time_quant ,int output_fd
             done ++;
             current->exit_time = time;
             log_pcb(current, LOG_EXIT, time, output_fd);
-            pcbs = list_remove_node(pcbs, 0);
+            pcbs = list_remove_item(pcbs, 0); // remove and free pcb from list
             quantprog = 0;
             goto CURRENT_ROUND; // redo this round to start executing the next process
         }
