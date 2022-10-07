@@ -10,6 +10,17 @@
 #define TIMEWAIT 1
 
 void pr_run_processes_fcfs(linked_node_t* processes, int output_fd){
+    /* 
+     * This function runs a list of processes stored as process_record_t
+     * using the first come first serve alrgorithm.
+     * The output is printed to stdout and written to the output file.
+     * ARGUMENTS:
+     *  - processes: any node from a linked list (list.h),
+     *               in the type of process_record_t (process_record.h)
+     *               The list of processes to be executed.
+     *  - output_fd: an integer, the file descriptor of output file.
+     */
+    
     int total_process_count = (int) list_length(processes);
 
     // create a list to store pcbs currently in system.
@@ -89,6 +100,18 @@ void pr_run_processes_fcfs(linked_node_t* processes, int output_fd){
 }
 
 void pr_run_processes_rr(linked_node_t* processes, int time_quant ,int output_fd){
+    /* 
+     * This function runs a list of processes stored as process_record_t
+     * using the round robin alrgorithm.
+     * The output is printed to stdout and written to the output file.
+     * ARGUMENTS:
+     *  - processes: any node from a linked list (list.h),
+     *               in the type of process_record_t (process_record.h)
+     *               The list of processes to be executed.
+     *  - time_quant: an integer, the time quantum for round robin algorithm.
+     *  - output_fd: an integer, the file descriptor of output file.
+     */
+
     int total_process_count = (int) list_length(processes);
 
     // create a list to store pcbs currently in system.
@@ -191,7 +214,30 @@ void pr_run_processes_rr(linked_node_t* processes, int time_quant ,int output_fd
 
 }
 
+void pr_run_processes_uf(linked_node_t* processes, int output_fd){
+    /* 
+     * This function runs a list of processes stored as process_record_t
+     * using the urgent first alrgorithm.
+     * The output is printed to stdout and written to the output file.
+     * The algorithm will check for which process has the most urgent deadline to meet
+     * everyround, and execute that process until finished.
+     * ARGUMENTS:
+     *  - processes: any node from a linked list (list.h),
+     *               in the type of process_record_t (process_record.h)
+     *               The list of processes to be executed.
+     *  - output_fd: an integer, the file descriptor of output file.
+     */
+}
+
 pcb_t* pr_record_to_pcb(process_record_t* record){
+    /* 
+     * Converts a record to a pcb when the process arrives in to the system.
+     * Also initialises fields such as remaining time and status to default value.
+     * ARGUMENTS:
+     *  - record: a process_record_t (see process_record.h) to be converted.
+     * RETURN:
+     *  - a pointer to the converted pcb_t (see process_runner.h) allocated in heap.
+     */
     pcb_t* pcb = (pcb_t*) malloc(sizeof(pcb_t));
     strcpy(pcb->process_name, record->process_name);
     pcb->entry_time = 0;
@@ -205,6 +251,19 @@ pcb_t* pr_record_to_pcb(process_record_t* record){
 }
 
 linked_node_t* pr_next_processes(int t, linked_node_t* processes){
+    /* 
+     * Takes in a list of processes in process_record_t* (see process_record.h)
+     * and the time iteration of current round, returns a list of process_record_t*
+     * that will arrive in this time iteration.
+     * The newly created list will be in heap, while the content of the newly created list
+     * points to the same addresses of the processes passed in through argument.
+     * ARGUMENTS:
+     *  - t: an integer, the time iteration the function need to find out for arriving processes.
+     *  - processes: any node of the linked list storing the pointers
+     *    pointing to processes in process_record_t.
+     * RETURN:
+     *  - a list containing the processes to be arrived in this time iteration.
+     */
     linked_node_t* next = list_create_empty();
     for (int i = 0; i < list_length(processes); i++){
         process_record_t* record = (process_record_t*) list_get_item(processes, i);
