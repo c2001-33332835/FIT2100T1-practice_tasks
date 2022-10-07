@@ -170,6 +170,15 @@ void pr_run_processes_rr(linked_node_t* processes, int time_quant ,int output_fd
 
         NEXT_ROUND:
 
+        // check if any process missing deadline
+        for (int i = 0; i < list_length(pcbs); i++){
+            pcb_t* process = (pcb_t*) list_get_item(pcbs, i);
+            int turnaround = time - process->entry_time;
+            if (process->deadline == turnaround){
+                log_pcb(process, LOG_DEADLINEMISS, time, output_fd);
+            }
+        }
+
         // if all processes is executed
         if (done >= total_process_count){
             break;
