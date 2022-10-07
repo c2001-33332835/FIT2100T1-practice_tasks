@@ -1,7 +1,17 @@
 #include "list.h"
 #include "stdlib.h"
 
+/* This is the implementation of a linked list interface defined in list.h.
+ * This list has dynamic length of dynamic type, both node and item should be stored in heap.
+ * (basically each list item is a void pointer)
+ * Each list is defined by nodes pointing to each other, ordered.
+ * In my implementation, any node from a list can represent the entire list itself.
+ */
+
 linked_node_t* list_get_last_node(linked_node_t* node){
+    /* Given any node form a list in argument,
+     * Return the pointer to the last node in the list.
+     */
     linked_node_t* curr = node;
     while (!curr->end){
         curr = curr->next;
@@ -10,6 +20,9 @@ linked_node_t* list_get_last_node(linked_node_t* node){
 }
 
 linked_node_t* list_get_start_node(linked_node_t* node){
+    /* given any node from a list in the argument,
+     * Return the pointer to the first node in the list.
+     */
     linked_node_t* curr = node;
     while (!curr->start){
         curr = curr->prev;
@@ -18,6 +31,9 @@ linked_node_t* list_get_start_node(linked_node_t* node){
 }
 
 linked_node_t* list_append_node(linked_node_t* node, void* data){
+    /* Given any node from a as the argument,
+     * Append data (pointer to data) from argument to the end of the list.
+     */
     linked_node_t* end = list_get_last_node(node);
 
     if (end->empty){
@@ -38,6 +54,10 @@ linked_node_t* list_append_node(linked_node_t* node, void* data){
 }
 
 linked_node_t* list_create(void* data){
+    /* Accepts a data (pointer to a data)
+     * creates a list in heap containg only the data
+     * The return type is a pointer to the newly created list.
+     */
     linked_node_t* new_node = (linked_node_t*) malloc(sizeof(linked_node_t));
     new_node->end = 1;
     new_node->start = 1;
@@ -47,6 +67,10 @@ linked_node_t* list_create(void* data){
 }
 
 linked_node_t* list_create_size(int size){
+    /* Accepts an integer as the size of the list
+     * creates an uninitialised list of the given size in the heap.
+     * The return type is a pointer to the newly created list.
+     */
     linked_node_t* new_node = (linked_node_t*) malloc(sizeof(linked_node_t));
     new_node->content = NULL;
     new_node->start = 1;
@@ -61,6 +85,9 @@ linked_node_t* list_create_size(int size){
 }
 
 linked_node_t* list_create_empty(){
+    /* Creates an empty list in the heap.
+     * The return type is a pointer to the newly created list.
+     */
     linked_node_t* new_node = (linked_node_t*) malloc(sizeof(linked_node_t));
     new_node->content = NULL;
     new_node->start = 1;
@@ -71,6 +98,10 @@ linked_node_t* list_create_empty(){
 }
 
 void list_free(linked_node_t* node){
+    /* Accepts any node from a list.
+     * Free all nodes and data* (the content) of the given list from heap.
+     */
+    
     // check if empty
     if (node->empty){
         free(node);
@@ -85,6 +116,10 @@ void list_free(linked_node_t* node){
 }
 
 void list_free_nodes(linked_node_t* node){
+    /* Accepts any node from a list.
+     * Free only the nodes (not the content) of the given list from heap.
+     */
+
     linked_node_t* start = list_get_start_node(node);
     while (!start->end){
         list_remove_last_node(start);
@@ -93,6 +128,10 @@ void list_free_nodes(linked_node_t* node){
 }
 
 void list_remove_last(linked_node_t* node){
+    /* Accepts any node from a list
+     * Remove the last node from the list (including the content)
+     * Free the last node and the content
+     */
     linked_node_t* end = list_get_last_node(node);
     if (!end->start){
         end->prev->end = 1;
@@ -102,6 +141,11 @@ void list_remove_last(linked_node_t* node){
 }
 
 void list_remove_last_node(linked_node_t* node){
+    /* Accepts any node from a list
+     * Remove only the last node from the list
+     * Free the last node and *not the content
+     */
+    
     linked_node_t* end = list_get_last_node(node);
     if (!end->start){
         end->prev->end = 1;
@@ -110,6 +154,12 @@ void list_remove_last_node(linked_node_t* node){
 }
 
 linked_node_t* list_remove_item(linked_node_t* node, int index){
+    /* Accepts any node from a list, and an index to be removed
+     * Remove only the node and the content in the position.
+     * Free the node and the content from heap.
+     * Return a new pointer to the list since the pointer may be freed from memory.
+     */
+
     linked_node_t* target = list_get_node(node, index);
     
     // check if empty
@@ -122,6 +172,12 @@ linked_node_t* list_remove_item(linked_node_t* node, int index){
 }
 
 linked_node_t* list_remove_node(linked_node_t* node, int index){
+    /* Accepts any node from a list, and an index to be removed
+     * Remove only the node at the position.
+     * Free the node and *not the content from heap.
+     * Return a new pointer to the list since the pointer may be freed from memory.
+     */
+
     linked_node_t* target = list_get_node(node, index);
     
     // check if empty
@@ -161,6 +217,11 @@ linked_node_t* list_remove_node(linked_node_t* node, int index){
 }
 
 void list_set_item(linked_node_t* node, int index, void* data){
+    /* Accepts any node from a list, an integer index, and a data to be set.
+     * Sets the content of the list at the given index to given data.
+     * data should always be a pointer of a heap memory address
+     */
+
     linked_node_t* target = list_get_node(node, index);
     if (target->empty){
         return;
@@ -170,6 +231,11 @@ void list_set_item(linked_node_t* node, int index, void* data){
 }
 
 linked_node_t* list_get_node(linked_node_t* node, int index){
+    /* Accepts any node from a list, and an integer index.
+     * Gets the node of the list at the given index.
+     * If index is larger then list lenght, then last node is given.
+     * Returns a pointer to that node
+     */
     linked_node_t* curr = list_get_start_node(node);
 
     for (int i = 0; i != index && !curr->end; i++){
@@ -179,10 +245,18 @@ linked_node_t* list_get_node(linked_node_t* node, int index){
 }
 
 void* list_get_item(linked_node_t* node, int index){
+    /* Accepts any node from a list, and an integer index.
+     * Gets the content of the list at the given index.
+     * If index is larger then list lenght, then last item is given.
+     * Returns a pointer to the content of the item at index.
+     */
     return list_get_node(node, index)->content;
 }
 
 unsigned list_length(linked_node_t* node){
+    /* Accepts any node from a list.
+     * Returns an unsigned int of the length of the list.
+     */
     linked_node_t* curr = list_get_start_node(node);
     if (curr->empty){
         return 0;
@@ -196,6 +270,10 @@ unsigned list_length(linked_node_t* node){
 }
 
 void list_reverse(linked_node_t* node){
+    /* Accepts any node from a list.
+     * Reverse the content of the list,
+     * ie. the first item will become the last item and etc.
+     */
     if (node->empty){
         return;
     }
@@ -205,6 +283,9 @@ void list_reverse(linked_node_t* node){
 }
 
 void list_reverse_r(linked_node_t* node){
+    /* Accpets the FIRST NODE of a list.
+     * Recursivly reverse the prev and next addresses to reverse the list.
+     */
     if (node->start){
         node->start = 0;
         node->end = 1;
@@ -227,6 +308,12 @@ void list_reverse_r(linked_node_t* node){
 }
 
 linked_node_t* list_duplicate(linked_node_t* node){
+    /* Accepts any node from a list.
+     * the pointer of content is copied to another newly created list in heap.
+     * Return the pointer to the new list.
+     * Only list is copied, content is not copied
+     * (2 lists containing same set of pointers).
+     */
     linked_node_t* new = list_create_empty();
     for (int i = 0; i < list_length(node); i++){
         list_append_node(new, list_get_item(node, i));

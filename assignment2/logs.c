@@ -14,9 +14,19 @@
 #define WHITE '7'
 
 void log_string(char* message, log_string_type_t log_type){
+    /* This function logs a string message into stdout or stderr, 
+     * in a human readable format with color coding.
+     * message is being printed to stdout, except when log_type is LOG_STRERR.
+     * When the log_type is LOG_STRERR, log is printed to stderr.
+     * ARGUMENTS:
+     *  - message: a pointer to a string, the message to be printed.
+     *  - log_type: enum log_string_type_t (see logs.h), the log type.
+     */
     char label[17];
-    strcpy(label, "[ [3 ;1m  [0m]");
+    strcpy(label, "[ [3 ;1m  [0m]"); // for color printing
     label[1] = label[9] = ESC;
+
+    // depending on the log type, show different color and symbol
     switch(log_type){
         case LOG_STRDFLT:
             label[4] = GREEN;
@@ -36,6 +46,7 @@ void log_string(char* message, log_string_type_t log_type){
             break;
     }
 
+    // composite of full message
     char full_length = strlen(message) + strlen(label) + 3;
     char full_message[full_length];
     strcpy(full_message, label);
@@ -43,18 +54,33 @@ void log_string(char* message, log_string_type_t log_type){
     strcat(full_message, message);
     strcat(full_message, "\n");
 
+    // if log type is LOG_STRERR, print the message to stderr.
     if (log_type == LOG_STRERR){
         fprintf(stderr, full_message);
         return;
     }
+
+    // else print to stdout
     printf(full_message);
 };
 
 void log_iteration(int iteration){
+    /* This function logs the time iteration of a given integer to stdout. 
+     * ARGUMENTS:
+     *  - iteration: an integer representing the iteration.
+     */
     printf("%c[30;1m[@t=%d]%c[0m\n", ESC, iteration, ESC);
 }
 
 void log_pcb(pcb_t* block, log_functional_type_t log_type, int t, int output_fd){
+    /* This function prints out a certain event such as process arriving, process exit and etc.
+     * When it is an process exit event, the process summary is written to the output file. 
+     * ARGUMENTS:
+     *  - block: a pointer to the block to be logged in pcb_t (see process_runner.h)
+     *  - log_type: enum log_functional_type_t (see logs.h), the type of event happened to block.
+     *  - t: integer, the time iteration this event happened.
+     *  - output_fd: integer, the file descriptor of the output file opened.
+     */
     char label[] = "  [3 ;1m  [0m ";
     label[1] = label[9] = ESC;
 
