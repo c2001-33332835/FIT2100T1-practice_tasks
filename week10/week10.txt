@@ -1,0 +1,43 @@
+=== TASK 3.1.1 ===
+
+The key to print out "x is 5" is to have the expression in if statement returns true (x is not 5), and before the printf executed, x has to get assigned to 5 by another set of instructions.
+
+If we were to let P1 to print "x is 5", P2 has to execute x = x - 1 before P1's if statement, and x = x + 1 to reset it back to 5 before the print statement of P1.
+Same for P2, if we were to let P2 to print "x is 5", P1 has to execute its x = x - 1 before P2's if statement, and P1 has to execute x = x + 1 to reset it back to 5 befroe P2's print statement.
+
+It is impossible to make both programs print "x is 5" at the same time. because in order to reach the if statement of either program, it will have to already set the values and reset the values, which is a pre-requirement of the other program to print x is 5, and if the other program has printed x is 5, then it will have already done the pre-requirement procedures for the first one and the first one has missed it.
+
+=== TASK 3.1.2 ===
+
+a)
+
+The upperbound is 50, given that all processes are being executed without clashing into each other.
+The lowerbound is 2, given that one process can has its entier procedures done before the other process has written to the variable, and then overrides it back with 1 then increments by 1, give us 2.
+
+b)
+
+It the maximum concurrent process is 1, then there will be no concurrent, the outcome will be predictable. Both upperbound and lowerbound will be n*25.
+
+=== TASK 4.1.1 ===
+
++---------+---------+-----------+------------+
+| Process | Max     | Allocated | Need       |
++---------+---------+-----------+------------+
+| P1      | 70      | 45        | 25         |
+| P2      | 60      | 40        | 50         |
+| P3      | 60      | 15        | 45         |
++---------+---------+-----------+------------+
+| P4 (a)  | 60      | 25        | 25         |
+|    (b)  | 60      | 35        | 15         |
++---------+---------+-----------+------------+
+
+TTOTAL 150
+total - Allocated of P1,P2,P3 = 150 - 45 - 40 - 15 = 50
+
+a)
+50 - 25 = 25 
+SAFE, all processes executed with sufficient memory
+
+b)
+50 - 35 = 15
+UNSAFE
