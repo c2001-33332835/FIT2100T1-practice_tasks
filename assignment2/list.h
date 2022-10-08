@@ -13,6 +13,7 @@ typedef struct linked_node {
 linked_node_t* list_get_last_node(linked_node_t* node);
 linked_node_t* list_get_start_node(linked_node_t* node);
 linked_node_t* list_append_node(linked_node_t* node, void* data);
+linked_node_t* list_push_front(linked_node_t* node, void* data);
 linked_node_t* list_create(void* data);
 linked_node_t* list_create_size(int size);
 linked_node_t* list_create_empty();

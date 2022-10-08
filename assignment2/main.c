@@ -85,17 +85,15 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
-    char* base_schedule_msg = "Scheduling %d process(es) with Round robin (RR) Algorithm, with a time quantum of %d.";
+    char* base_schedule_msg = "Scheduling %d process(es) with Urgent First (UF) Algorithm.";
     int process_count_length;
     int_count_digits(list_length(processes), &process_count_length);
-    int tq_length;
-    int_count_digits(RR_TIMEQUANT, &tq_length);
-    char schedule_msg[strlen(base_schedule_msg) + tq_length + process_count_length + 1];
-    sprintf(schedule_msg, base_schedule_msg, list_length(processes), RR_TIMEQUANT);
+    char schedule_msg[strlen(base_schedule_msg) + process_count_length + 1];
+    sprintf(schedule_msg, base_schedule_msg, list_length(processes));
     log_string(schedule_msg, LOG_STRDFLT);
 
     // run round robin algorithm
-    pr_run_processes_rr(processes, RR_TIMEQUANT, output_fd);
+    pr_run_processes_uf(processes, output_fd);
 
     log_string("All processes exited.", LOG_STRDFLT);
 

@@ -33,6 +33,7 @@ linked_node_t* list_get_start_node(linked_node_t* node){
 linked_node_t* list_append_node(linked_node_t* node, void* data){
     /* Given any node from a as the argument,
      * Append data (pointer to data) from argument to the end of the list.
+     * Return the newly created node
      */
     linked_node_t* end = list_get_last_node(node);
 
@@ -50,6 +51,30 @@ linked_node_t* list_append_node(linked_node_t* node, void* data){
     new_node->empty = 0;
     end->next = new_node;
     end->end = 0;
+    return new_node;
+}
+
+linked_node_t* list_push_front(linked_node_t* node, void* data){
+    /* Given any node from a as the argument,
+     * Push data (pointer to data) from argument to the beginning of the list.
+     * Return the newly created node
+     */
+    linked_node_t* start = list_get_start_node(node);
+
+    if (start->empty){
+        start->content = data;
+        start->empty = 0;
+        return start;
+    }
+
+    linked_node_t* new_node = (linked_node_t*) malloc(sizeof(linked_node_t));
+    new_node->start = 1;
+    new_node->end = 0;
+    new_node->next = start;
+    new_node->content = data;
+    new_node->empty = 0;
+    start->start = 0;
+    start->prev = new_node;
     return new_node;
 }
 

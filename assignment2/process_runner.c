@@ -219,14 +219,136 @@ void pr_run_processes_uf(linked_node_t* processes, int output_fd){
      * This function runs a list of processes stored as process_record_t
      * using the urgent first alrgorithm.
      * The output is printed to stdout and written to the output file.
-     * The algorithm will check for which process has the most urgent deadline to meet
-     * everyround, and execute that process until finished.
+     * This algorithm will check which process is urgent, and prioritises
+     * the processes which has a higher chance on meeting its deadline.
      * ARGUMENTS:
      *  - processes: any node from a linked list (list.h),
      *               in the type of process_record_t (process_record.h)
      *               The list of processes to be executed.
      *  - output_fd: an integer, the file descriptor of output file.
      */
+
+    int total_process_count = (int) list_length(processes);
+
+    // create a list to store pcbs currently in system.
+    linked_node_t* pcbs = list_create_empty(); // execution queue
+    int time = 0; // the time iteration (t value).
+    int done = 0; // number of processes exitted.
+    int curr_end = 0; // bool if current process has ended, indicates get next process
+
+    while (1){
+        sleep(TIMEWAIT);
+        // log this iteration
+        log_iteration(time);
+
+        // check if there is new processes entering in thie new iteration
+        linked_node_t* next = pr_next_processes(time, processes);
+        for (int i = 0; i < list_length(next); i++){
+            process_record_t* record = (process_record_t*) list_get_item(next, i);
+            pcb_t* process = pr_record_to_pcb(record);
+            process->entry_time = time;
+            list_append_node(pcbs, process);
+            log_pcb(process, LOG_ARRIVE, time, output_fd); // log this arrival event
+        }
+        list_free_nodes(next);
+
+        CURRENT_ROUND:
+
+        // if no process arrived yet, skip iteration.
+        if (list_length(pcbs) == 0){
+            goto NEXT_ROUND;
+        }
+
+        // get next process
+        int urgent_index = 0; // index of the most urgent process
+        pcb_t* urgent_proc = (pcb_t*) list_get_item(pcbs, 0);
+        for (int i = 0; i < list_length(pcbs); i++){
+            pcb_t* proc = (pcb_t*) list_get_item(pcbs, i);
+            // get how long are there until remaining deadline.
+            int deadline_time = proc->entry_time + proc->deadline;
+            int remaining_deadline = time - deadline_time;
+            int can_hit_deadline = remaining_deadline > proc->remaining_time;
+
+            // get how long are there until remaining deadline for current urgent proc
+            int u_deadline_time = urgent_proc->entry_time + urgent_proc->deadline;
+            int u_remaining_deadline = time - u_deadline_time;
+            int u_can_hit_deadline = u_remaining_deadline > urgent_proc->remaining_time;
+
+            // if deadline is more urgent then current urgent
+            // and prioritise the process which has a higher chance of hitting deadline
+            if (remaining_deadline < u_remaining_deadline && can_hit_deadline){
+                urgent_index = i;
+                urgent_proc = proc;
+            }
+            // if time reamining to deadline is the same, run the one with shorter time
+            else if (remaining_deadline == u_remaining_deadline){
+                if (proc->remaining_time < urgent_proc->remaining_time){
+                    urgent_index = i;
+                    urgent_proc = proc;
+                }
+            }
+
+            // if index is not 0, swap process to prioritise new process
+            if (urgent_index != 0){
+                pcb_t* curr = (pcb_t*) list_get_item(pcbs, 0);
+                curr->status = PS_PAUSED;
+                log_pcb(curr, LOG_SUSPENSION, time, output_fd);
+                pcbs = list_remove_node(pcbs, i);
+                list_push_front(pcbs, urgent_proc);
+            }
+        }
+
+        // get current process
+        pcb_t* current = (pcb_t*) list_get_item(pcbs, 0);
+
+        // if first time running this process, start the process
+        if (current->status == PS_READY){
+            curr_end = 0;
+            current->status = PS_RUNNING;
+            current->start_time = time;
+            log_pcb(current, LOG_START, time, output_fd);
+        }
+
+        if (current->status == PS_PAUSED){
+            current->status = PS_RUNNING;
+            log_pcb(current, LOG_RESUME, time, output_fd);
+        }
+
+        // if the process ends in this round
+        if (current->status == PS_RUNNING && current->remaining_time == 0){
+            done ++;
+            current->exit_time = time;
+            log_pcb(current, LOG_EXIT, time, output_fd);
+            pcbs = list_remove_item(pcbs, 0); // remove and free pcb from list
+            curr_end = 1;
+            goto CURRENT_ROUND; // redo this round to start executing the next process
+        }
+
+        // run the process if not finished, increase time quantum progress
+        if (current->status == PS_RUNNING){
+            current->remaining_time --;
+            goto NEXT_ROUND;
+        }
+
+        NEXT_ROUND:
+
+        // check if any process missing deadline
+        for (int i = 0; i < list_length(pcbs); i++){
+            pcb_t* process = (pcb_t*) list_get_item(pcbs, i);
+            int turnaround = time - process->entry_time;
+            if (process->deadline == turnaround){
+                log_pcb(process, LOG_DEADLINEMISS, time, output_fd);
+            }
+        }
+
+        // if all processes is executed
+        if (done >= total_process_count){
+            break;
+        }
+        time ++;
+    }
+
+    list_free(pcbs);
 }
 
 pcb_t* pr_record_to_pcb(process_record_t* record){
