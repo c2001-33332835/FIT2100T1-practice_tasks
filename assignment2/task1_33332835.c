@@ -15,7 +15,7 @@
 #define in_range(I, MAX) (int I = 0; I < MAX; I++)
 
 #define FALLBACK_SOURCE "processes.txt"
-#define FALLBACK_REUSLT "results-tasknum.txt"
+#define FALLBACK_REUSLT "results-1.txt"
 
 int load_file(linked_node_t** result, char* filename){
     /* 1 = success, 0 = failed */
