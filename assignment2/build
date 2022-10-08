@@ -1,13 +1,5 @@
 #!/usr/bin/bash
 
-DEBUG=""
-if test "$1" = "-r"
-then
-    DEBUG="-g"
-fi
-gcc main.c list.c process_record.c string_utils.c logs.c process_runner.c -o main -w -lm $DEBUG
-if test "$1" != "-r"
-then
-    ./main $1
-    rm main
-fi
+gcc task1_33332835.c list.c process_record.c string_utils.c logs.c process_runner.c -o task1 -w -lm $DEBUG
+gcc task2_33332835.c list.c process_record.c string_utils.c logs.c process_runner.c -o task2 -w -lm $DEBUG
+gcc task3_33332835.c list.c process_record.c string_utils.c logs.c process_runner.c -o task3 -w -lm $DEBUG
