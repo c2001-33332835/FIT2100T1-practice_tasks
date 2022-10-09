@@ -9,6 +9,14 @@
 
 #define TIMEWAIT 1
 
+/* This is the library that simulates the execution process and scheduling algorithms.
+ * This library contains 3 different algorithms:
+ *  - the First Come First Serve (FCFS) algorithm
+ *  - the Round Robin (rr) algorithm
+ *  - the Urgent First (uf) algorithm (designed and implemented by myself, Xuanao Zhao 33332835)
+ * as well as some utilities function useful in the simulation process.
+ */
+
 void pr_run_processes_fcfs(linked_node_t* processes, int output_fd){
     /* 
      * This function runs a list of processes stored as process_record_t

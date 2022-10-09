@@ -13,6 +13,15 @@
 #define MAGENTA '5'
 #define WHITE '7'
 
+/* This is the library for logging into stdout and into file.
+ * When using log_string, it is being logged to stdout as a replacement of printf
+ * Multiple log level is provided such as error, warning and etc.
+ * When using the LOG_STRERR log level/log type, message is printed to stderr instead
+ * log_pcb and log_iteration is part of the simulation, which logs the time iteration and important events
+ * When a process being logged is exitting using the LOG_EXIT type, the process execution summary 
+ * is being written to the result file opened.
+*/
+
 void log_string(char* message, log_string_type_t log_type){
     /* This function logs a string message into stdout or stderr, 
      * in a human readable format with color coding.

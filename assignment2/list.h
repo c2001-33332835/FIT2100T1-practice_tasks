@@ -1,6 +1,16 @@
 #ifndef LIST_H
 #define LIST_H
 
+/* This is the implementation of a linked list interface defined in list.h.
+ * This list has dynamic length of dynamic type, both node and item should be stored in heap.
+ * (basically each list item is a void pointer)
+ * Each list is defined by nodes pointing to each other, ordered.
+ * In my implementation, any node from a list can represent the entire list itself.
+ * 
+ * This is the header file for interface and intellisense 
+ * The implementation of this file is in list.c
+ */
+
 typedef struct linked_node {
     struct linked_node* next;
     struct linked_node* prev;

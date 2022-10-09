@@ -2,6 +2,16 @@
 #define PROCESS_FILE_H
 #include "list.h"
 
+/* This is the library to read and parse source files into process records.
+ * Thie library works when the file is already opened using the low level open,
+ * and accepts file descriptor to read files.
+ * All records are being parsed into process_record_t, a struct type, and stored into 
+ * a list defined and decleared in list.h and list.c. All data parsed is stored in heap.
+ *
+ * This is the header file for interface and intellisense 
+ * The implementation of this file is in process_record.c
+ */
+
 typedef struct process_record {
     char process_name[11];
     int arrive_time;

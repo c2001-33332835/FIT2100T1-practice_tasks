@@ -2,6 +2,17 @@
 #include <string.h>
 #include "list.h"
 
+/* This is a library for custom string utilities.
+ * The utilities includes:
+ *  - Splitting a string into a linked list by a deliminater.
+ *    (The linked list is defined and decleared in list.h and list.c)
+ *  - Counting integer by its length (kind of like counting the length after converting to string)
+ *  - Compare the alphabetical order of 2 string.
+ * 
+ * Implementation of int_count_digits contains codes found from onilne resources.
+ * See reference in comments in the function body
+ */
+
 linked_node_t* str_split(char* source, char deliminater){
     /* Takes in a pointer to a string, split the string by deliminator
      * stores the splitted string in a list, in the heap.
@@ -81,6 +92,9 @@ void int_count_digits(int n, int* result){
      * This funtion contains code from the following URL:
      * https://stackoverflow.com/questions/3068397/finding-the-length-of-an-integer-in-c
      * By Jordan Lewis, 18th of June, 2010
+     * 
+     * APA Reference:
+     * Jordan Lewis (2010, June 18) Finding the length of an integer in C [Source Code]. https://stackoverflow.com/questions/3068397/finding-the-length-of-an-integer-in-c
      * 
      * Thus the content of this function does not license under MIT LICENSE.
      * Jordan Lewis owns the copyright of the content of this function.

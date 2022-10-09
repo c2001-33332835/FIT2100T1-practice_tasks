@@ -13,6 +13,18 @@
 #define FALLBACK_REUSLT "results-3.txt"
 #define RR_TIMEQUANT 2
 
+/* This is the main file
+ * which contains the entry point for simulation process for the UF algorithm
+ * This program will load source file, either from a file specified in argv[1]
+ * or the fallback file of "processes.txt"
+ * The simulation result will be printed to stdout
+ * a file will be created to store the summary (task1_33332835)
+ * 
+ * Student Name/ID: Xuanao Zhao / 33332835
+ * Copyright: (c) 2022 Xuanao Zhao, MIT License Applied
+ * Latest Modification Date: 8th of OCT, 2022
+ */
+
 int load_file(linked_node_t** result, char* filename){
     /* 1 = success, 0 = failed */
 

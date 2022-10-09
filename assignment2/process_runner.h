@@ -4,6 +4,17 @@
 #include "list.h"
 #include "process_record.h"
 
+/* This is the library that simulates the execution process and scheduling algorithms.
+ * This library contains 3 different algorithms:
+ *  - the First Come First Serve (FCFS) algorithm
+ *  - the Round Robin (rr) algorithm
+ *  - the Urgent First (uf) algorithm (designed and implemented by myself, Xuanao Zhao 33332835)
+ * as well as some utilities function useful in the simulation process.
+ *
+ * This is the header file for interface and intellisense 
+ * The implementation of this file is in process_runner.c
+ */
+
 typedef enum {
     PS_READY, PS_RUNNING, PS_EXIT, PS_PAUSED
 } process_state_t;
