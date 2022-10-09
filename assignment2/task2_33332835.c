@@ -9,11 +9,6 @@
 #include "process_runner.h"
 #include "logs.h"
 
-#define castpointerval(T, V) *((T*)(V))
-#define castpointer(T, V) ((T*)(V))
-#define malloctype(T, M) ((T*) malloc(M * sizeof(T)))
-#define in_range(I, MAX) (int I = 0; I < MAX; I++)
-
 #define FALLBACK_SOURCE "processes.txt"
 #define FALLBACK_REUSLT "results-2.txt"
 #define RR_TIMEQUANT 2
